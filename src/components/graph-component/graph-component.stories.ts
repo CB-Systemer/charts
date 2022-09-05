@@ -19,7 +19,7 @@ const defaultArgs = {
   swimlaneData: [
     {
       label: 'Lane 1',
-      data: [
+      circles: [
         {
           x: 9,
           value: 'Kampagne 1',
@@ -29,10 +29,11 @@ const defaultArgs = {
           value: 'Kampagne 1',
         },
       ],
+      blocks: [],
     },
     {
       label: 'Lane 2',
-      data: [
+      circles: [
         {
           x: 13,
           value: 'Kampagne 2',
@@ -40,6 +41,13 @@ const defaultArgs = {
         {
           x: 25,
           value: 'Kampagne 2',
+        },
+      ],
+      blocks: [
+        {
+          x1: 3,
+          x2: 6,
+          label: 'Some block',
         },
       ],
     },

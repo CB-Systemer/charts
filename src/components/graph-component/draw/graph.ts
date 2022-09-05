@@ -23,9 +23,14 @@ export interface GraphData {
 
 export interface GraphSwimlaneData {
   label: string;
-  data: {
+  circles: {
     x: number;
     value: string;
+  }[];
+  blocks: {
+    x1: number;
+    x2: number;
+    label: string;
   }[];
 }
 
@@ -85,7 +90,7 @@ export class Graph {
   };
 
   calcX = () => {
-    const maxSwimlaneLabelWidth = this.swimlaneData.map(x => x.data.map(y => this._p.textWidth(y.value)).reduce((a, b) => Math.max(a, b))).reduce((p, c) => Math.max(p, c));
+    const maxSwimlaneLabelWidth = this.swimlaneData.map(x => x.circles.map(y => this._p.textWidth(y.value)).reduce((a, b) => Math.max(a, b))).reduce((p, c) => Math.max(p, c));
     const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft;
 
     const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / (this.graphData.length - 1);
@@ -173,7 +178,8 @@ export class Graph {
           height: this._options.swimlaneHeight,
           d: 10,
           marginX: this.xcalc.graphMarginL,
-          data: x.data,
+          circles: x.circles,
+          blocks: x.blocks,
         }),
     );
   };
