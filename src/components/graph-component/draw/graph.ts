@@ -117,7 +117,7 @@ export class Graph {
     const marginBWithSwimlanes = this._options.spaceGraphSwimlanes + this.swimlaneData.length * this._options.swimlaneHeight + this._options.marginBottom;
 
     const availableHeightForGraph = this._p.height - this._options.marginTop - marginBWithSwimlanes;
-    const maxValue = this.graphData.map(x => x.value).reduce((p, c) => Math.max(p, c));
+    const maxValue = this.graphData.map(x => x.value).reduce((p, c) => Math.max(p, c), 0);
     const minValue = 0;
     const middleValue = (maxValue - minValue) / 2;
 
@@ -127,7 +127,7 @@ export class Graph {
     const middleLine = Math.round((bottomLine - topLine) / 2) + this._options.marginTop;
 
     const lineLabels = [maxValue.toString(), middleValue.toString(), minValue.toString()];
-    const maxLineLabelsWidth = lineLabels.map(x => this._p.textWidth(x)).reduce((p, c) => Math.max(p, c));
+    const maxLineLabelsWidth = lineLabels.map(x => this._p.textWidth(x)).reduce((p, c) => Math.max(p, c), 0);
 
     const h = availableHeightForGraph / graphMaxValue;
 
