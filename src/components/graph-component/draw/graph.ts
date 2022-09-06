@@ -98,7 +98,7 @@ export class Graph {
   };
 
   calcX = () => {
-    const maxSwimlaneLabelWidth = this.swimlaneData.map(x => x.circles.map(y => this._p.textWidth(y.value)).reduce((a, b) => Math.max(a, b))).reduce((p, c) => Math.max(p, c));
+    const maxSwimlaneLabelWidth = this.swimlaneData.map(x => this._p.textWidth(x.label)).reduce((a, b) => Math.max(a, b), 0);
     const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft;
 
     const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / this._options.xAxis.length;
@@ -199,8 +199,8 @@ export class Graph {
   };
 
   getX = (id: string) => {
-    const xAxis = this._options.xAxis.find(y => y.id === id);
-    return this.xcalc.positions[xAxis.id]?.x;
+    const xAxis = this._options.xAxis.findIndex(y => y.id === id);
+    return this.xcalc.positions[xAxis]?.x;
   };
 
   fillX = () => {
@@ -331,6 +331,7 @@ export class Graph {
   };
 
   dispose = () => {
+    this._parent.childNodes.forEach(x => x.remove());
     if (this._rezizeObserver) {
       this._rezizeObserver.disconnect();
     }

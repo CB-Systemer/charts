@@ -1,4 +1,4 @@
-import { Component, h, Host, Prop, State } from '@stencil/core';
+import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
 import { Graph, GraphData, GraphOptions, GraphSwimlaneData } from './draw/graph';
 
 @Component({
@@ -16,8 +16,17 @@ export class GraphComponent {
     this.graph = new Graph(this.graphContainerRef, this.options, this.graphData, this.swimlaneData);
   }
 
+  @Watch('graphData')
+  graphDataWatch() {
+    this.graph.dispose();
+    this.graph = new Graph(this.graphContainerRef, this.options, this.graphData, this.swimlaneData);
+  }
+
   setGraphContainerRef = (r: HTMLElement) => {
-    if (this.graphContainerRef) return;
+    if (this.graphContainerRef) {
+      return;
+    }
+
     this.graphContainerRef = r;
   };
   @State() graphContainerRef: HTMLElement;
