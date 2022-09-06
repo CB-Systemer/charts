@@ -248,26 +248,31 @@ export class Graph {
   isRedrawRequired = (): boolean => {
     let onDrawElement = false;
 
+    // Has the canvas size changed?
     if (this.canvasWidth !== this._p.width || this.canvasHeight !== this._p.height) {
       this.canvasWidth = this._p.width;
       this.canvasHeight = this._p.height;
 
+      console.log('Redraw: Canvas size changed');
       onDrawElement = true;
     }
 
     for (let index = 0; index < this.graphCircles.length; index++) {
       const element = this.graphCircles[index];
       if (element.isMouseOver(this._p.mouseX, this._p.mouseY)) {
+        console.log('Redraw: Cursor is hovering a circle');
         onDrawElement = true;
         break;
       }
     }
 
     if (!onDrawElement && (this._p.mouseX < 0 || this._p.mouseX > this._p.width || this._p.mouseY < 0 || this._p.mouseY > this._p.height)) {
-      return;
+      return false;
     }
 
-    if (!onDrawElement && this.mouseX === this._p.mouseX && this.mouseY === this._p.mouseY) return;
+    if (!onDrawElement && this.mouseX === this._p.mouseX && this.mouseY === this._p.mouseY) {
+      return false;
+    }
 
     return true;
   };

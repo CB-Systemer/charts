@@ -1,6 +1,6 @@
 import p5 from 'p5';
 
-export interface CircleData {
+export interface BlockData {
   x1: number;
   w: number;
   y: number;
@@ -11,10 +11,10 @@ export interface CircleData {
 
 export class Block {
   p: p5;
-  data: CircleData;
+  data: BlockData;
   i: number;
 
-  constructor(p: p5, data: CircleData) {
+  constructor(p: p5, data: BlockData) {
     this.p = p;
     this.data = data;
     this.i = this.data.d;
@@ -48,8 +48,6 @@ export class Block {
 
   public isMouseOver(x: number, y: number) {
     const r = x > this.data.x1 && x < this.data.x1 + this.data.w && y > this.getY() && y < this.getY() + this.data.d;
-    console.log('isMouseOver?', r, x, y, this.data, this.getY());
-
     return r;
   }
 }
