@@ -1,9 +1,25 @@
 import { getComponentWithArgs } from '../../utils/storybook-utils';
 import { GraphData } from './draw/graph';
 
+const xAxis = (): {
+  id: string;
+  data: string;
+}[] => {
+  const graphData = [];
+  for (let index = 3; index < 50; index++) {
+    graphData.push({
+      id: index.toString(),
+      data: new Date(Date.UTC(2022, 8, index)).toISOString(),
+    });
+  }
+
+  return graphData;
+};
+
 const randomData = (): GraphData[] => {
   const graphData = [];
   for (let index = 6; index < 45; index++) {
+    if (index > 10 && index < 16) continue;
     graphData.push({
       id: index.toString(),
       date: new Date(Date.UTC(2022, 8, index)),
@@ -21,11 +37,11 @@ const defaultArgs = {
       label: 'Lane 1',
       circles: [
         {
-          x: 9,
+          id: '9',
           value: 'Kampagne 1',
         },
         {
-          x: 24,
+          id: '24',
           value: 'Kampagne 1',
         },
       ],
@@ -35,31 +51,32 @@ const defaultArgs = {
       label: 'Lane 2',
       circles: [
         {
-          x: 13,
+          id: '13',
           value: 'Kampagne 2',
         },
         {
-          x: 25,
+          id: '25',
           value: 'Kampagne 2',
         },
       ],
       blocks: [
         {
-          x1: 3,
-          x2: 6,
+          id1: '12',
+          id2: '19',
           label: 'Some block',
         },
       ],
     },
   ],
   options: {
+    xAxis: xAxis(),
     marginTop: 20,
     marginRight: 10,
     marginBottom: 20,
     marginLeft: 10,
     spaceGraphSwimlanes: 30,
     swimlaneHeight: 20,
-    xAxisFormatter: graphData => graphData.date.toLocaleDateString(),
+    xAxisFormatter: graphData => new Date(graphData).toLocaleDateString(),
   },
 };
 

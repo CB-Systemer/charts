@@ -6,30 +6,34 @@ import { XAxis } from './x-axis';
 import { XCalc, YCalc } from './xcalc';
 
 export interface GraphOptions {
+  xAxis: {
+    id: string;
+    data: string;
+  }[];
   marginTop: number;
   marginRight: number;
   marginBottom: number;
   marginLeft: number;
   spaceGraphSwimlanes: number;
   swimlaneHeight: number;
-  xAxisFormatter: (graphData: GraphData) => string;
+  xAxisFormatter: (data: string) => string;
 }
 
 export interface GraphData {
   id: string;
-  date: Date;
+  // date: Date;
   value: number;
 }
 
 export interface GraphSwimlaneData {
   label: string;
   circles: {
-    x: number;
+    id: string;
     value: string;
   }[];
   blocks: {
-    x1: number;
-    x2: number;
+    id1: string;
+    id2: string;
     label: string;
   }[];
 }
@@ -49,13 +53,17 @@ export class Graph {
   constructor(parent: HTMLElement, options: GraphOptions, graphData: GraphData[], swimlaneData: GraphSwimlaneData[]) {
     this._parent = parent;
     this._options = options ?? {
+      xAxis: graphData.map(x => ({
+        id: x.id,
+        data: x.id,
+      })),
       marginTop: 20,
       marginRight: 10,
       marginBottom: 20,
       marginLeft: 10,
       spaceGraphSwimlanes: 30,
       swimlaneHeight: 20,
-      xAxisFormatter: graphData => graphData.date.toLocaleDateString(),
+      xAxisFormatter: graphData => graphData,
     };
     this.graphData = graphData;
     this.swimlaneData = swimlaneData;
@@ -93,14 +101,14 @@ export class Graph {
     const maxSwimlaneLabelWidth = this.swimlaneData.map(x => x.circles.map(y => this._p.textWidth(y.value)).reduce((a, b) => Math.max(a, b))).reduce((p, c) => Math.max(p, c));
     const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft;
 
-    const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / (this.graphData.length - 1);
-    const split = Math.round(this.graphData.length / 3);
+    const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / this._options.xAxis.length;
+    const split = Math.round(this._options.xAxis.length / 3);
     this.xcalc = {
       graphMarginL,
-      positions: [...new Array(this.graphData.length).keys()].map(x => ({
+      positions: [...new Array(this._options.xAxis.length).keys()].map(x => ({
         x: graphMarginL + x * widthBetween,
-        hasMark: x % split === 0 || x === this.graphData.length - 1,
-        label: this._options.xAxisFormatter(this.graphData[x]),
+        hasMark: x % split === 0 || x === this._options.xAxis.length - 1,
+        label: this._options.xAxisFormatter(this._options.xAxis[x].data),
       })),
     };
   };
@@ -140,9 +148,9 @@ export class Graph {
 
   fillCircles = () => {
     this.graphCircles = this.graphData.map(
-      (x, i) =>
+      x =>
         new Circle(this._p, {
-          x: this.xcalc.positions[i].x,
+          x: this.getX(x.id),
           y: this._p.height - x.value * this.ycalc.height - this.ycalc.marginBWithSwimlanes,
           d: 3,
           mouseD: 20,
@@ -172,16 +180,27 @@ export class Graph {
       (x, i) =>
         new Swimlane(this._p, {
           label: x.label,
-          xcalc: this.xcalc,
           x: this.xcalc.graphMarginL,
           y: this.ycalc.swimLanes[i],
           height: this._options.swimlaneHeight,
           d: 10,
           marginX: this.xcalc.graphMarginL,
-          circles: x.circles,
-          blocks: x.blocks,
+          circles: x.circles.map(c => ({
+            x: this.getX(c.id),
+            value: c.value,
+          })),
+          blocks: x.blocks.map(b => ({
+            x1: this.getX(b.id1),
+            x2: this.getX(b.id2),
+            label: b.label,
+          })),
         }),
     );
+  };
+
+  getX = (id: string) => {
+    const xAxis = this._options.xAxis.find(y => y.id === id);
+    return this.xcalc.positions[xAxis.id]?.x;
   };
 
   fillX = () => {

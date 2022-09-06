@@ -1,7 +1,6 @@
 import p5 from 'p5';
 import { Block } from './block';
 import { Circle } from './circle';
-import { XCalc } from './xcalc';
 
 export interface SwimlaneData {
   label: string;
@@ -9,7 +8,6 @@ export interface SwimlaneData {
   y: number;
   height: number;
   marginX: number;
-  xcalc: XCalc;
   d: number;
   circles: {
     x: number;
@@ -37,7 +35,7 @@ export class Swimlane {
       this.data.circles?.map(
         x =>
           new Circle(this.p, {
-            x: this.data.xcalc.positions[x.x].x,
+            x: x.x,
             y: this.data.y + this.data.height / 2,
             d: this.data.d,
             mouseD: this.data.d,
@@ -49,8 +47,8 @@ export class Swimlane {
       this.data.blocks?.map(
         x =>
           new Block(this.p, {
-            x1: this.data.xcalc.positions[x.x1].x,
-            w: this.data.xcalc.positions[x.x2].x - this.data.xcalc.positions[x.x1].x,
+            x1: x.x1,
+            w: x.x2 - x.x1,
             y: this.data.y,
             d: this.data.d,
             label: x.label,
