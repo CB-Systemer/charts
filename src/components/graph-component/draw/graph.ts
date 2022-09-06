@@ -297,6 +297,10 @@ export class Graph {
   };
 
   drawOverlayAboveGraph = () => {
+    if (this.graphCircles.length === 0) {
+      return;
+    }
+
     this._p.fill(240);
     this._p.stroke(255);
     this._p.strokeWeight(0);
