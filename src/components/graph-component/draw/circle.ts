@@ -20,12 +20,10 @@ export class Circle {
   }
 
   public draw(x: number, y: number) {
-    this.p.fill(255);
+    this.p.fill(6, 95, 70);
+    this.p.stroke(6, 95, 70);
     this.p.strokeWeight(1);
     if (this.isMouseOver(x, y)) {
-      if (this.i < this.data.d * 1.5) {
-        this.i++;
-      }
       this.p.circle(this.data.x, this.data.y, this.i);
       if (this.data.label) {
         this.p.fill(0);
@@ -34,9 +32,6 @@ export class Circle {
         this.p.text(this.data.label, x, y - 10);
       }
     } else {
-      if (this.i > this.data.d) {
-        this.i--;
-      }
       this.p.circle(this.data.x, this.data.y, this.i);
     }
   }

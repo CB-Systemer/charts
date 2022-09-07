@@ -17,24 +17,33 @@ export interface GraphOptions {
   spaceGraphSwimlanes: number;
   swimlaneHeight: number;
   xAxisFormatter: (data: string) => string;
+  textSize: number;
+  labelTextSize: number;
 }
 
 export interface GraphData {
   id: string;
-  // date: Date;
   value: number;
 }
 
 export interface GraphSwimlaneData {
   label: string;
-  circles: {
+  squares: {
     id: string;
     value: string;
+    fillColor: string;
+    strokeColor: string;
+    gradientBottomColor: string;
+    gradientTopColor: string;
   }[];
   blocks: {
     id1: string;
     id2: string;
     label: string;
+    fillColor: string;
+    strokeColor: string;
+    gradientBottomColor: string;
+    gradientTopColor: string;
   }[];
 }
 
@@ -64,6 +73,8 @@ export class Graph {
       spaceGraphSwimlanes: 30,
       swimlaneHeight: 20,
       xAxisFormatter: graphData => graphData,
+      textSize: 16,
+      labelTextSize: 12,
     };
     this.graphData = graphData;
     this.swimlaneData = swimlaneData;
@@ -98,6 +109,7 @@ export class Graph {
   };
 
   calcX = () => {
+    this._p.textSize(this._options.textSize);
     const maxSwimlaneLabelWidth = this.swimlaneData.map(x => this._p.textWidth(x.label)).reduce((a, b) => Math.max(a, b), 0);
     const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft;
 
@@ -183,16 +195,26 @@ export class Graph {
           x: this.xcalc.graphMarginL,
           y: this.ycalc.swimLanes[i],
           height: this._options.swimlaneHeight,
-          d: 10,
+          d: 16,
           marginX: this.xcalc.graphMarginL,
-          circles: x.circles.map(c => ({
+          squares: x.squares.map(c => ({
             x: this.getX(c.id),
             value: c.value,
+            stroke: this._p.color(c.strokeColor ?? '#065f46'),
+            fill: this._p.color(c.fillColor ?? '#065f46'),
+            cornerRadius: 5,
+            gradientBottom: this._p.color(c.gradientBottomColor ?? '#bbf7d0'),
+            gradientTop: this._p.color(c.gradientTopColor ?? '#f0fdf4'),
           })),
           blocks: x.blocks.map(b => ({
             x1: this.getX(b.id1),
             x2: this.getX(b.id2),
             label: b.label,
+            stroke: this._p.color(b.strokeColor ?? '#075985'),
+            fill: this._p.color(b.fillColor ?? '#075985'),
+            cornerRadius: 5,
+            gradientBottom: this._p.color(b.gradientBottomColor ?? '#7dd3fc'),
+            gradientTop: this._p.color(b.gradientTopColor ?? '#f0f9ff'),
           })),
         }),
     );
@@ -208,6 +230,7 @@ export class Graph {
       marginX: this.xcalc.graphMarginL,
       marginB: this.ycalc.marginBWithSwimlanes,
       xcalc: this.xcalc,
+      textSize: this._options.labelTextSize,
     });
   };
 
@@ -225,8 +248,10 @@ export class Graph {
     this.mouseX = this._p.mouseX;
     this.mouseY = this._p.mouseY;
 
-    this._p.background(this._p.color(240));
-    this._p.textSize(12);
+    this._p.background(this._p.color(255));
+    this._p.textFont('ui-sans-serif');
+
+    this._p.textSize(this._options.textSize);
     this._p.textAlign(this._p.LEFT, this._p.TOP);
 
     var mx = this.mouseX;
@@ -248,6 +273,7 @@ export class Graph {
       this._p.line(this.ycalc.maxLineLabelsWidth + 20, y, this._p.width, y);
       this._p.strokeWeight(0);
       this._p.fill(0, 0, 0);
+      this._p.textSize(this._options.textSize);
       this._p.text(this.ycalc.lineLabels[i], 10, y);
     });
 
@@ -256,8 +282,15 @@ export class Graph {
       this._p.strokeWeight(1);
       this._p.line(0, y, this._p.width, y);
       this._p.strokeWeight(0);
-      this._p.fill(0, 0, 0);
+      this._p.fill(0);
+      this._p.textSize(this._options.textSize);
       this._p.text(this.swimlaneData[i].label, 10, y + this._options.swimlaneHeight / 2);
+
+      if (i === this.ycalc.swimLanes.length - 1) {
+        this._p.stroke(200);
+        this._p.strokeWeight(1);
+        this._p.line(0, y + this._options.swimlaneHeight, this._p.width, y + this._options.swimlaneHeight);
+      }
     });
 
     this.graphLines.forEach(x => x.draw(mx, my));
@@ -301,7 +334,7 @@ export class Graph {
       return;
     }
 
-    this._p.fill(240);
+    this._p.fill(255);
     this._p.stroke(255);
     this._p.strokeWeight(0);
     this._p.beginShape();

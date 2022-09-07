@@ -35,35 +35,47 @@ const defaultArgs = {
   swimlaneData: [
     {
       label: 'Lane 1',
-      circles: [
+      squares: [
         {
           id: '9',
-          value: 'Kampagne 1',
+          value: '6',
+          fillColor: '#065f46',
+          strokeColor: '#065f46',
+          gradientBottomColor: '#bbf7d0',
+          gradientTopColor: '#f0fdf4',
         },
         {
           id: '24',
-          value: 'Kampagne 1',
+          value: '2',
+          fillColor: '#5f0621',
+          strokeColor: '#5f0621',
+          gradientBottomColor: '#f7bbcc',
+          gradientTopColor: '#fdf0f3',
         },
       ],
       blocks: [],
     },
     {
       label: 'Lane 2',
-      circles: [
+      squares: [
         {
-          id: '13',
-          value: 'Kampagne 2',
-        },
-        {
-          id: '25',
-          value: 'Kampagne 2',
+          id: '26',
+          value: '',
+          fillColor: '#075985',
+          strokeColor: '#075985',
+          gradientBottomColor: '#7dd3fc',
+          gradientTopColor: '#f0f9ff',
         },
       ],
       blocks: [
         {
           id1: '12',
           id2: '19',
-          label: 'Some block',
+          label: '',
+          fillColor: '#075985',
+          strokeColor: '#075985',
+          gradientBottomColor: '#7dd3fc',
+          gradientTopColor: '#f0f9ff',
         },
       ],
     },
@@ -75,8 +87,10 @@ const defaultArgs = {
     marginBottom: 20,
     marginLeft: 10,
     spaceGraphSwimlanes: 30,
-    swimlaneHeight: 20,
+    swimlaneHeight: 25,
     xAxisFormatter: graphData => new Date(graphData).toLocaleDateString(),
+    textSize: 16,
+    labelTextSize: 12,
   },
 };
 

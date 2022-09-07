@@ -1,12 +1,16 @@
 import p5 from 'p5';
 
 export interface BlockData {
-  x1: number;
-  w: number;
+  x: number;
+  width: number;
   y: number;
-  d: number;
+  height: number;
+  marginTop: number;
   mouseD: number;
   label: string;
+  fill: p5.Color;
+  stroke: p5.Color;
+  cornerRadius: number;
 }
 
 export class Block {
@@ -17,17 +21,18 @@ export class Block {
   constructor(p: p5, data: BlockData) {
     this.p = p;
     this.data = data;
-    this.i = this.data.d;
+    this.i = this.data.height;
   }
 
   public draw(x: number, y: number) {
-    this.p.fill(255);
+    this.p.fill(this.data.fill);
+    this.p.stroke(this.data.stroke);
     this.p.strokeWeight(1);
     if (this.isMouseOver(x, y)) {
-      if (this.i < this.data.d * 1.5) {
+      if (this.i < this.data.height * 1.5) {
         this.i++;
       }
-      this.p.rect(this.data.x1, this.getY(), this.data.w, this.data.d);
+      this.p.rect(this.data.x, this.getY(), this.data.width, this.data.height, this.data.cornerRadius);
       if (this.data.label) {
         this.p.fill(0);
         this.p.strokeWeight(0);
@@ -35,19 +40,19 @@ export class Block {
         this.p.text(this.data.label, x, y - 10);
       }
     } else {
-      if (this.i > this.data.d) {
+      if (this.i > this.data.height) {
         this.i--;
       }
-      this.p.rect(this.data.x1, this.getY(), this.data.w, this.data.d);
+      this.p.rect(this.data.x, this.getY(), this.data.width, this.data.height, this.data.cornerRadius);
     }
   }
 
   public getY() {
-    return this.data.y + this.data.d / 2;
+    return this.data.y + this.data.marginTop;
   }
 
   public isMouseOver(x: number, y: number) {
-    const r = x > this.data.x1 && x < this.data.x1 + this.data.w && y > this.getY() && y < this.getY() + this.data.d;
+    const r = x > this.data.x && x < this.data.x + this.data.width && y > this.getY() && y < this.getY() + this.data.height;
     return r;
   }
 }
