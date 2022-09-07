@@ -197,7 +197,7 @@ export class Graph {
           height: this._options.swimlaneHeight,
           d: 16,
           marginX: this.xcalc.graphMarginL,
-          squares: x.squares.map(c => ({
+          squares: x.squares?.map(c => ({
             x: this.getX(c.id),
             value: c.value,
             stroke: this._p.color(c.strokeColor ?? '#065f46'),
@@ -206,7 +206,7 @@ export class Graph {
             gradientBottom: this._p.color(c.gradientBottomColor ?? '#bbf7d0'),
             gradientTop: this._p.color(c.gradientTopColor ?? '#f0fdf4'),
           })),
-          blocks: x.blocks.map(b => ({
+          blocks: x.blocks?.map(b => ({
             x1: this.getX(b.id1),
             x2: this.getX(b.id2),
             label: b.label,

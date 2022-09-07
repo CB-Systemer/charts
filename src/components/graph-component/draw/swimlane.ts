@@ -9,25 +9,29 @@ export interface SwimlaneData {
   height: number;
   marginX: number;
   d: number;
-  squares: {
-    x: number;
-    value: string;
-    fill: p5.Color;
-    stroke: p5.Color;
-    cornerRadius: number;
-    gradientTop: p5.Color;
-    gradientBottom: p5.Color;
-  }[];
-  blocks: {
-    x1: number;
-    x2: number;
-    label: string;
-    fill: p5.Color;
-    stroke: p5.Color;
-    cornerRadius: number;
-    gradientTop: p5.Color;
-    gradientBottom: p5.Color;
-  }[];
+  squares:
+    | {
+        x: number;
+        value: string;
+        fill: p5.Color;
+        stroke: p5.Color;
+        cornerRadius: number;
+        gradientTop: p5.Color;
+        gradientBottom: p5.Color;
+      }[]
+    | undefined;
+  blocks:
+    | {
+        x1: number;
+        x2: number;
+        label: string;
+        fill: p5.Color;
+        stroke: p5.Color;
+        cornerRadius: number;
+        gradientTop: p5.Color;
+        gradientBottom: p5.Color;
+      }[]
+    | undefined;
 }
 
 export class Swimlane {
