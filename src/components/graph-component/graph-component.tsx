@@ -17,6 +17,7 @@ export class GraphComponent {
   }
 
   @Watch('graphData')
+  @Watch('swimlaneData')
   graphDataWatch() {
     this.graph.dispose();
     this.graph = new Graph(this.graphContainerRef, this.options, this.graphData, this.swimlaneData);
