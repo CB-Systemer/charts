@@ -257,10 +257,8 @@ export class Graph {
     var mx = this.mouseX;
     var my = this.mouseY;
 
-    this.swimlanes.forEach(x => x.draw(mx, my));
+    this.swimlanes.reverse().forEach(x => x.draw(mx, my));
 
-    // this._p.stroke(0);
-    // this._p.strokeWeight(0);
     this.xAxis.draw();
 
     this.drawOverlayAboveGraph();
