@@ -1,5 +1,5 @@
 import { Component, h, Host, Prop, State, Watch } from '@stencil/core';
-import { Graph, GraphData, GraphOptions, GraphSwimlaneData } from './draw/graph';
+import { Graph, GraphData, GraphOptions, GraphSwimlaneData, XAxisData } from './draw/graph';
 
 @Component({
   tag: 'graph-component',
@@ -8,19 +8,21 @@ import { Graph, GraphData, GraphOptions, GraphSwimlaneData } from './draw/graph'
 export class GraphComponent {
   graph: Graph;
 
-  @Prop() graphData: GraphData[] = [];
-  @Prop() swimlaneData: GraphSwimlaneData[];
   @Prop() options: GraphOptions;
+  @Prop() data: {
+    xaxis: XAxisData[];
+    graphData: GraphData[];
+    swimlaneData: GraphSwimlaneData[];
+  };
 
   componentDidLoad() {
-    this.graph = new Graph(this.graphContainerRef, this.options, this.graphData, this.swimlaneData);
+    this.graph = new Graph(this.graphContainerRef, this.options, this.data.xaxis, this.data.graphData, this.data.swimlaneData);
   }
 
-  @Watch('graphData')
-  @Watch('swimlaneData')
+  @Watch('data')
   graphDataWatch() {
     this.graph.dispose();
-    this.graph = new Graph(this.graphContainerRef, this.options, this.graphData, this.swimlaneData);
+    this.graph = new Graph(this.graphContainerRef, this.options, this.data.xaxis, this.data.graphData, this.data.swimlaneData);
   }
 
   setGraphContainerRef = (r: HTMLElement) => {

@@ -6,10 +6,6 @@ import { XAxis } from './x-axis';
 import { XCalc, YCalc } from './xcalc';
 
 export interface GraphOptions {
-  xAxis: {
-    id: string;
-    data: string;
-  }[];
   marginTop: number;
   marginRight: number;
   marginBottom: number;
@@ -21,6 +17,10 @@ export interface GraphOptions {
   labelTextSize: number;
 }
 
+export interface XAxisData {
+  id: string;
+  data: string;
+}
 export interface GraphData {
   id: string;
   value: number;
@@ -53,19 +53,16 @@ export class Graph {
   private _rezizeObserver: ResizeObserver;
   private _options: GraphOptions;
 
+  private xaxis: XAxisData[];
   private graphData: GraphData[];
   private swimlaneData: GraphSwimlaneData[];
 
   private xcalc: XCalc;
   private ycalc: YCalc;
 
-  constructor(parent: HTMLElement, options: GraphOptions, graphData: GraphData[], swimlaneData: GraphSwimlaneData[]) {
+  constructor(parent: HTMLElement, options: GraphOptions, xaxis: XAxisData[], graphData: GraphData[], swimlaneData: GraphSwimlaneData[]) {
     this._parent = parent;
     this._options = options ?? {
-      xAxis: graphData.map(x => ({
-        id: x.id,
-        data: x.id,
-      })),
       marginTop: 20,
       marginRight: 10,
       marginBottom: 20,
@@ -76,8 +73,18 @@ export class Graph {
       textSize: 16,
       labelTextSize: 12,
     };
+
+    this.xaxis = xaxis;
+
     this.graphData = graphData;
     this.swimlaneData = swimlaneData;
+
+    if (!this.xaxis) {
+      graphData.map(x => ({
+        id: x.id,
+        data: x.id,
+      }));
+    }
 
     this.setup();
     this.calcAndFill();
@@ -113,14 +120,14 @@ export class Graph {
     const maxSwimlaneLabelWidth = this.swimlaneData.map(x => this._p.textWidth(x.label)).reduce((a, b) => Math.max(a, b), 0);
     const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft;
 
-    const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / this._options.xAxis.length;
-    const split = Math.round(this._options.xAxis.length / 3);
+    const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / this.xaxis.length;
+    const split = Math.round(this.xaxis.length / 3);
     this.xcalc = {
       graphMarginL,
-      positions: [...new Array(this._options.xAxis.length).keys()].map(x => ({
+      positions: [...new Array(this.xaxis.length).keys()].map(x => ({
         x: graphMarginL + x * widthBetween,
-        hasMark: x % split === 0 || x === this._options.xAxis.length - 1,
-        label: this._options.xAxisFormatter(this._options.xAxis[x].data),
+        hasMark: x % split === 0 || x === this.xaxis.length - 1,
+        label: this._options.xAxisFormatter(this.xaxis[x].data),
       })),
     };
   };
@@ -221,7 +228,7 @@ export class Graph {
   };
 
   getX = (id: string) => {
-    const xAxis = this._options.xAxis.findIndex(y => y.id === id);
+    const xAxis = this.xaxis.findIndex(y => y.id === id);
     return this.xcalc.positions[xAxis]?.x;
   };
 

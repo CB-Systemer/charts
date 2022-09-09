@@ -5,12 +5,15 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { GraphData, GraphOptions, GraphSwimlaneData } from "./components/graph-component/draw/graph";
+import { GraphData, GraphOptions, GraphSwimlaneData, XAxisData } from "./components/graph-component/draw/graph";
 export namespace Components {
     interface GraphComponent {
-        "graphData": GraphData[];
+        "data": {
+    xaxis: XAxisData[];
+    graphData: GraphData[];
+    swimlaneData: GraphSwimlaneData[];
+  };
         "options": GraphOptions;
-        "swimlaneData": GraphSwimlaneData[];
     }
 }
 declare global {
@@ -26,9 +29,12 @@ declare global {
 }
 declare namespace LocalJSX {
     interface GraphComponent {
-        "graphData"?: GraphData[];
+        "data"?: {
+    xaxis: XAxisData[];
+    graphData: GraphData[];
+    swimlaneData: GraphSwimlaneData[];
+  };
         "options"?: GraphOptions;
-        "swimlaneData"?: GraphSwimlaneData[];
     }
     interface IntrinsicElements {
         "graph-component": GraphComponent;
