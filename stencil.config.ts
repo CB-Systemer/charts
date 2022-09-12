@@ -5,7 +5,7 @@ export const config: Config = {
     reloadStrategy: 'pageReload',
   },
   sourceMap: true,
-  namespace: 'realequity-components',
+  namespace: 'realequity-charts',
   outputTargets: [
     {
       type: 'dist',
@@ -13,10 +13,6 @@ export const config: Config = {
     },
     {
       type: 'dist-custom-elements',
-    },
-    {
-      type: 'www',
-      serviceWorker: null, // disable service workers
     },
   ],
 };
