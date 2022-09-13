@@ -4,6 +4,7 @@ import { Line } from './line';
 import { Swimlane } from './swimlane';
 import { XAxis } from './x-axis';
 import { XCalc, YCalc } from './xcalc';
+import Logger, { ILogger } from 'js-logger';
 
 export interface GraphOptions {
   marginTop: number;
@@ -15,6 +16,8 @@ export interface GraphOptions {
   xAxisFormatter: (data: string) => string;
   textSize: number;
   labelTextSize: number;
+  fonts: string[];
+  logger: ILogger | undefined;
 }
 
 export interface XAxisData {
@@ -53,6 +56,8 @@ export class Graph {
   private _rezizeObserver: ResizeObserver;
   private _options: GraphOptions;
 
+  private logger: ILogger;
+  private font: string;
   private xaxis: XAxisData[];
   private graphData: GraphData[][];
   private swimlaneData: GraphSwimlaneData[];
@@ -62,17 +67,24 @@ export class Graph {
 
   constructor(parent: HTMLElement, options: GraphOptions, xaxis: XAxisData[], graphData: GraphData[][], swimlaneData: GraphSwimlaneData[]) {
     this._parent = parent;
-    this._options = options ?? {
-      marginTop: 20,
-      marginRight: 10,
-      marginBottom: 20,
-      marginLeft: 10,
-      spaceGraphSwimlanes: 30,
-      swimlaneHeight: 20,
-      xAxisFormatter: graphData => graphData,
-      textSize: 16,
-      labelTextSize: 12,
+    this._options = {
+      ...{
+        marginTop: 20,
+        marginRight: 10,
+        marginBottom: 20,
+        marginLeft: 10,
+        spaceGraphSwimlanes: 30,
+        swimlaneHeight: 20,
+        xAxisFormatter: graphData => graphData,
+        textSize: 16,
+        labelTextSize: 12,
+        fonts: [],
+        logger: Logger,
+      },
+      ...options,
     };
+    this.logger = this._options.logger ?? Logger.get('Graph');
+    this.logger.debug('Graph setup with options', this._options);
 
     this.xaxis = xaxis;
 
@@ -90,13 +102,33 @@ export class Graph {
   }
 
   setup = () => {
+    this.logger.debug('Setup begin');
+
     this._p = new p5(() => {
       // We setup
     }, this._parent);
 
+    for (let index = 0; index < this._options.fonts.length; index++) {
+      const element = this._options.fonts[index];
+
+      try {
+        const result = document.fonts.check(`${this._options.textSize}px ${element}`);
+        if (result) {
+          this.logger.debug(`Font: '${element}' found on local system`);
+          this.font = element;
+          break;
+        }
+      } catch {
+        // ignore and continue to the next font
+        this.logger.debug(`Font: ${element} not found found on local system.`);
+      }
+    }
+
     this._p.createCanvas(this._parent.getBoundingClientRect().width, this._parent.getBoundingClientRect().height);
 
     this.setupResize();
+
+    this.logger.debug('Setup end');
   };
 
   calcAndFill = () => {
@@ -104,7 +136,7 @@ export class Graph {
     this.fillCircles();
     this.fillGraphYLines();
     this.fillSwimlanes();
-    this.fillX();
+    this.fillXAxis();
   };
 
   calc = () => {
@@ -179,16 +211,16 @@ export class Graph {
 
   fillGraphYLines = () => {
     this.graphLines = [];
-    this.graphCircles.forEach((x, i) => {
+    this.graphCircles.forEach(x => {
       x.forEach((_, ii) => {
         if (ii === 0) return;
 
         this.graphLines.push(
           new Line(this._p, {
-            x1: this.graphCircles[i][ii - 1].data.x,
-            y1: this.graphCircles[i][ii - 1].data.y,
-            x2: this.graphCircles[i][ii].data.x,
-            y2: this.graphCircles[i][ii].data.y,
+            x1: x[ii - 1].data.x,
+            y1: x[ii - 1].data.y,
+            x2: x[ii].data.x,
+            y2: x[ii].data.y,
           }),
         );
       });
@@ -233,7 +265,7 @@ export class Graph {
     return this.xcalc.positions[xAxis]?.x;
   };
 
-  fillX = () => {
+  fillXAxis = () => {
     this.xAxis = new XAxis(this._p, {
       marginX: this.xcalc.graphMarginL,
       marginB: this.ycalc.marginBWithSwimlanes,
@@ -253,35 +285,31 @@ export class Graph {
       return;
     }
 
+    this.logger.debug('Drawing:');
+
     this.mouseX = this._p.mouseX;
     this.mouseY = this._p.mouseY;
 
     this._p.background(this._p.color(255));
-    this._p.textFont('ui-sans-serif');
 
+    this._p.textFont(this.font);
     this._p.textSize(this._options.textSize);
     this._p.textAlign(this._p.LEFT, this._p.TOP);
 
     var mx = this.mouseX;
     var my = this.mouseY;
 
+    this.logger.debug('Drawing swimlanes');
     this.swimlanes.reverse().forEach(x => x.draw(mx, my));
 
+    this.logger.debug('Drawing xAxis');
     this.xAxis.draw();
 
+    this.logger.debug('Drawing overlayAboveGraph');
     this.drawOverlayAboveGraph();
 
-    this._p.strokeWeight(1);
-    this._p.textAlign(this._p.LEFT, this._p.CENTER);
-    this.ycalc.graphLines.forEach((y, i) => {
-      this._p.stroke(200);
-      this._p.strokeWeight(1);
-      this._p.line(this.ycalc.maxLineLabelsWidth + 20, y, this._p.width, y);
-      this._p.strokeWeight(0);
-      this._p.fill(0, 0, 0);
-      this._p.textSize(this._options.textSize);
-      this._p.text(this.ycalc.lineLabels[i], 10, y);
-    });
+    this.logger.debug('Drawing graphLines');
+    this.drawGraphLines();
 
     this.ycalc.swimLanes.forEach((y, i) => {
       this._p.stroke(200);
@@ -299,7 +327,9 @@ export class Graph {
       }
     });
 
+    this.logger.debug('Drawing graphLines');
     this.graphLines.forEach(x => x.draw(mx, my));
+    this.logger.debug('Drawing graphCircles');
     this.graphCircles.forEach(x =>
       x.forEach(y => {
         y.draw(mx, my);
@@ -382,12 +412,27 @@ export class Graph {
     this._p.endShape(this._p.CLOSE);
   };
 
+  drawGraphLines = () => {
+    this._p.strokeWeight(1);
+    this._p.textAlign(this._p.LEFT, this._p.CENTER);
+    this.ycalc.graphLines.forEach((y, i) => {
+      this._p.stroke(200);
+      this._p.strokeWeight(1);
+      this._p.line(this.ycalc.maxLineLabelsWidth + 20, y, this._p.width, y);
+      this._p.strokeWeight(0);
+      this._p.fill(0, 0, 0);
+      this._p.textSize(this._options.textSize);
+      this._p.text(this.ycalc.lineLabels[i], 10, y);
+    });
+  };
+
   resize = (width: number, height: number) => {
+    this.logger.debug('Resizing');
     this.calc();
     this.fillCircles();
     this.fillGraphYLines();
     this.fillSwimlanes();
-    this.fillX();
+    this.fillXAxis();
 
     this._p.resizeCanvas(width, height);
   };

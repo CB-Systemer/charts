@@ -27,6 +27,7 @@
   },
   "dependencies": {
     "@stencil/core": "^2.13.0",
+    "js-logger": "^1.6.1",
     "p5": "^1.4.2"
   },
   "devDependencies": {
