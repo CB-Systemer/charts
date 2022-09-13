@@ -31,57 +31,59 @@ const randomData = (): GraphData[] => {
 };
 
 const defaultArgs = {
-  graphData: randomData(),
-  swimlaneData: [
-    {
-      label: 'Lane 1',
-      squares: [
-        {
-          id: '9',
-          value: '6',
-          fillColor: '#065f46',
-          strokeColor: '#065f46',
-          gradientBottomColor: '#bbf7d0',
-          gradientTopColor: '#f0fdf4',
-        },
-        {
-          id: '24',
-          value: '2',
-          fillColor: '#5f0621',
-          strokeColor: '#5f0621',
-          gradientBottomColor: '#f7bbcc',
-          gradientTopColor: '#fdf0f3',
-        },
-      ],
-      blocks: [],
-    },
-    {
-      label: 'Lane 2',
-      squares: [
-        {
-          id: '26',
-          value: '',
-          fillColor: '#075985',
-          strokeColor: '#075985',
-          gradientBottomColor: '#7dd3fc',
-          gradientTopColor: '#f0f9ff',
-        },
-      ],
-      blocks: [
-        {
-          id1: '12',
-          id2: '19',
-          label: '',
-          fillColor: '#075985',
-          strokeColor: '#075985',
-          gradientBottomColor: '#7dd3fc',
-          gradientTopColor: '#f0f9ff',
-        },
-      ],
-    },
-  ],
+  data: {
+    xaxis: xAxis(),
+    graphData: [randomData(), randomData()],
+    swimlaneData: [
+      {
+        label: 'Lane 1',
+        squares: [
+          {
+            id: '9',
+            value: '6',
+            fillColor: '#065f46',
+            strokeColor: '#065f46',
+            gradientBottomColor: '#bbf7d0',
+            gradientTopColor: '#f0fdf4',
+          },
+          {
+            id: '24',
+            value: '2',
+            fillColor: '#5f0621',
+            strokeColor: '#5f0621',
+            gradientBottomColor: '#f7bbcc',
+            gradientTopColor: '#fdf0f3',
+          },
+        ],
+        blocks: [],
+      },
+      {
+        label: 'Lane 2',
+        squares: [
+          {
+            id: '26',
+            value: '',
+            fillColor: '#075985',
+            strokeColor: '#075985',
+            gradientBottomColor: '#7dd3fc',
+            gradientTopColor: '#f0f9ff',
+          },
+        ],
+        blocks: [
+          {
+            id1: '12',
+            id2: '19',
+            label: '',
+            fillColor: '#075985',
+            strokeColor: '#075985',
+            gradientBottomColor: '#7dd3fc',
+            gradientTopColor: '#f0f9ff',
+          },
+        ],
+      },
+    ],
+  },
   options: {
-    xAxis: xAxis(),
     marginTop: 20,
     marginRight: 10,
     marginBottom: 20,

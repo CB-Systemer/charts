@@ -10,7 +10,7 @@ export namespace Components {
     interface GraphComponent {
         "data": {
     xaxis: XAxisData[];
-    graphData: GraphData[];
+    graphData: GraphData[][];
     swimlaneData: GraphSwimlaneData[];
   };
         "options": GraphOptions;
@@ -31,7 +31,7 @@ declare namespace LocalJSX {
     interface GraphComponent {
         "data"?: {
     xaxis: XAxisData[];
-    graphData: GraphData[];
+    graphData: GraphData[][];
     swimlaneData: GraphSwimlaneData[];
   };
         "options"?: GraphOptions;

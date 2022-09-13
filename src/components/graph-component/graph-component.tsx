@@ -11,7 +11,7 @@ export class GraphComponent {
   @Prop() options: GraphOptions;
   @Prop() data: {
     xaxis: XAxisData[];
-    graphData: GraphData[];
+    graphData: GraphData[][];
     swimlaneData: GraphSwimlaneData[];
   };
 

@@ -54,13 +54,13 @@ export class Graph {
   private _options: GraphOptions;
 
   private xaxis: XAxisData[];
-  private graphData: GraphData[];
+  private graphData: GraphData[][];
   private swimlaneData: GraphSwimlaneData[];
 
   private xcalc: XCalc;
   private ycalc: YCalc;
 
-  constructor(parent: HTMLElement, options: GraphOptions, xaxis: XAxisData[], graphData: GraphData[], swimlaneData: GraphSwimlaneData[]) {
+  constructor(parent: HTMLElement, options: GraphOptions, xaxis: XAxisData[], graphData: GraphData[][], swimlaneData: GraphSwimlaneData[]) {
     this._parent = parent;
     this._options = options ?? {
       marginTop: 20,
@@ -80,10 +80,7 @@ export class Graph {
     this.swimlaneData = swimlaneData;
 
     if (!this.xaxis) {
-      graphData.map(x => ({
-        id: x.id,
-        data: x.id,
-      }));
+      throw new Error('xaxis has not been provided');
     }
 
     this.setup();
@@ -136,7 +133,7 @@ export class Graph {
     const marginBWithSwimlanes = this._options.spaceGraphSwimlanes + this.swimlaneData.length * this._options.swimlaneHeight + this._options.marginBottom;
 
     const availableHeightForGraph = this._p.height - this._options.marginTop - marginBWithSwimlanes;
-    const maxValue = this.graphData.map(x => x.value).reduce((p, c) => Math.max(p, c), 0);
+    const maxValue = this.graphData.map(x => x.reduce((p, c) => Math.max(p, c.value), 0)).reduce((p, c) => Math.max(p, c), 0);
     const minValue = 0;
     const middleValue = (maxValue - minValue) / 2;
 
@@ -160,37 +157,41 @@ export class Graph {
     };
   };
 
-  graphCircles: Circle[];
+  graphCircles: Circle[][];
   graphLines: Line[];
   swimlanes: Swimlane[];
   xAxis: XAxis;
 
   fillCircles = () => {
-    this.graphCircles = this.graphData.map(
-      x =>
-        new Circle(this._p, {
-          x: this.getX(x.id),
-          y: this._p.height - x.value * this.ycalc.height - this.ycalc.marginBWithSwimlanes,
-          d: 3,
-          mouseD: 20,
-          label: x.value.toString(),
-        }),
+    this.graphCircles = this.graphData.map(x =>
+      x.map(
+        y =>
+          new Circle(this._p, {
+            x: this.getX(y.id),
+            y: this._p.height - y.value * this.ycalc.height - this.ycalc.marginBWithSwimlanes,
+            d: 3,
+            mouseD: 20,
+            label: y.value.toString(),
+          }),
+      ),
     );
   };
 
   fillGraphYLines = () => {
     this.graphLines = [];
-    this.graphCircles.forEach((_, i) => {
-      if (i === 0) return;
+    this.graphCircles.forEach((x, i) => {
+      x.forEach((_, ii) => {
+        if (ii === 0) return;
 
-      this.graphLines.push(
-        new Line(this._p, {
-          x1: this.graphCircles[i - 1].data.x,
-          y1: this.graphCircles[i - 1].data.y,
-          x2: this.graphCircles[i].data.x,
-          y2: this.graphCircles[i].data.y,
-        }),
-      );
+        this.graphLines.push(
+          new Line(this._p, {
+            x1: this.graphCircles[i][ii - 1].data.x,
+            y1: this.graphCircles[i][ii - 1].data.y,
+            x2: this.graphCircles[i][ii].data.x,
+            y2: this.graphCircles[i][ii].data.y,
+          }),
+        );
+      });
     });
   };
 
@@ -299,7 +300,11 @@ export class Graph {
     });
 
     this.graphLines.forEach(x => x.draw(mx, my));
-    this.graphCircles.forEach(x => x.draw(mx, my));
+    this.graphCircles.forEach(x =>
+      x.forEach(y => {
+        y.draw(mx, my);
+      }),
+    );
   };
 
   isRedrawRequired = (): boolean => {
@@ -316,9 +321,16 @@ export class Graph {
 
     for (let index = 0; index < this.graphCircles.length; index++) {
       const element = this.graphCircles[index];
-      if (element.isMouseOver(this._p.mouseX, this._p.mouseY)) {
-        console.log('Redraw: Cursor is hovering a circle');
-        onDrawElement = true;
+      for (let ii = 0; ii < element.length; ii++) {
+        const e = element[ii];
+
+        if (e.isMouseOver(this._p.mouseX, this._p.mouseY)) {
+          console.log('Redraw: Cursor is hovering a circle');
+          onDrawElement = true;
+          break;
+        }
+      }
+      if (onDrawElement) {
         break;
       }
     }
@@ -339,16 +351,33 @@ export class Graph {
       return;
     }
 
+    const list: { x: number; y: number }[] = [];
+    this.graphCircles.forEach(x => {
+      x.forEach(y => {
+        let f = list.find(l => l.x === y.data.x);
+        if (!f) {
+          f = {
+            x: y.data.x,
+            y: y.data.y,
+          };
+          list.push(f);
+        } else {
+          f.y = Math.max(y.data.y, f.y);
+        }
+      });
+    });
+
     this._p.fill(255);
     this._p.stroke(255);
     this._p.strokeWeight(0);
     this._p.beginShape();
     this._p.vertex(0, 0);
-    this._p.vertex(0, this.graphCircles.at(0).data.y);
-    this.graphCircles.forEach(x => {
-      this._p.vertex(x.data.x, x.data.y);
+    this._p.vertex(0, list.at(0).y, 0);
+
+    list.forEach(x => {
+      this._p.vertex(x.x, x.y);
     });
-    this._p.vertex(this._p.width, this.graphCircles.at(-1).data.y);
+    this._p.vertex(this._p.width, list.at(-1).y);
     this._p.vertex(this._p.width, 0);
     this._p.endShape(this._p.CLOSE);
   };
