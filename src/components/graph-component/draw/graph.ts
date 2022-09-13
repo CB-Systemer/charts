@@ -38,6 +38,7 @@ export interface GraphSwimlaneData {
     strokeColor: string;
     gradientBottomColor: string;
     gradientTopColor: string;
+    labelTextSize: number;
   }[];
   blocks: {
     id1: string;
@@ -47,6 +48,7 @@ export interface GraphSwimlaneData {
     strokeColor: string;
     gradientBottomColor: string;
     gradientTopColor: string;
+    labelTextSize: number;
   }[];
 }
 
@@ -84,7 +86,11 @@ export class Graph {
       ...options,
     };
     this.logger = this._options.logger ?? Logger.get('Graph');
-    this.logger.debug('Graph setup with options', this._options);
+
+    // Logger.warn('not');
+    // this.logger.setLevel(this.logger.DEBUG);
+    // console.log('log', this.logger);
+    // this.logger.debug('Graph setup with options', this._options);
 
     this.xaxis = xaxis;
 
@@ -204,6 +210,7 @@ export class Graph {
             d: 3,
             mouseD: 20,
             label: y.value.toString(),
+            labelTextSize: this._options.labelTextSize,
           }),
       ),
     );
@@ -228,36 +235,40 @@ export class Graph {
   };
 
   fillSwimlanes = () => {
-    this.swimlanes = this.swimlaneData.map(
-      (x, i) =>
-        new Swimlane(this._p, {
-          label: x.label,
-          x: this.xcalc.graphMarginL,
-          y: this.ycalc.swimLanes[i],
-          height: this._options.swimlaneHeight,
-          d: 16,
-          marginX: this.xcalc.graphMarginL,
-          squares: x.squares?.map(c => ({
-            x: this.getX(c.id),
-            value: c.value,
-            stroke: this._p.color(c.strokeColor ?? '#065f46'),
-            fill: this._p.color(c.fillColor ?? '#065f46'),
-            cornerRadius: 5,
-            gradientBottom: this._p.color(c.gradientBottomColor ?? '#bbf7d0'),
-            gradientTop: this._p.color(c.gradientTopColor ?? '#f0fdf4'),
-          })),
-          blocks: x.blocks?.map(b => ({
-            x1: this.getX(b.id1),
-            x2: this.getX(b.id2),
-            label: b.label,
-            stroke: this._p.color(b.strokeColor ?? '#075985'),
-            fill: this._p.color(b.fillColor ?? '#075985'),
-            cornerRadius: 5,
-            gradientBottom: this._p.color(b.gradientBottomColor ?? '#7dd3fc'),
-            gradientTop: this._p.color(b.gradientTopColor ?? '#f0f9ff'),
-          })),
-        }),
-    );
+    this.swimlanes = this.swimlaneData
+      .map(
+        (x, i) =>
+          new Swimlane(this._p, {
+            label: x.label,
+            x: this.xcalc.graphMarginL,
+            y: this.ycalc.swimLanes[i],
+            height: this._options.swimlaneHeight,
+            d: 16,
+            marginX: this.xcalc.graphMarginL,
+            squares: x.squares?.map(c => ({
+              x: this.getX(c.id),
+              value: c.value,
+              stroke: this._p.color(c.strokeColor ?? '#065f46'),
+              fill: this._p.color(c.fillColor ?? '#065f46'),
+              cornerRadius: 5,
+              gradientBottom: this._p.color(c.gradientBottomColor ?? '#bbf7d0'),
+              gradientTop: this._p.color(c.gradientTopColor ?? '#f0fdf4'),
+              labelTextSize: this._options.labelTextSize,
+            })),
+            blocks: x.blocks?.map(b => ({
+              x1: this.getX(b.id1),
+              x2: this.getX(b.id2),
+              label: b.label,
+              stroke: this._p.color(b.strokeColor ?? '#075985'),
+              fill: this._p.color(b.fillColor ?? '#075985'),
+              cornerRadius: 5,
+              gradientBottom: this._p.color(b.gradientBottomColor ?? '#7dd3fc'),
+              gradientTop: this._p.color(b.gradientTopColor ?? '#f0f9ff'),
+              labelTextSize: this._options.labelTextSize,
+            })),
+          }),
+      )
+      .reverse();
   };
 
   getX = (id: string) => {
@@ -285,14 +296,16 @@ export class Graph {
       return;
     }
 
-    this.logger.debug('Drawing:');
+    this.logger.debug('Drawing');
 
     this.mouseX = this._p.mouseX;
     this.mouseY = this._p.mouseY;
 
     this._p.background(this._p.color(255));
 
-    this._p.textFont(this.font);
+    if (this.font) {
+      this._p.textFont(this.font);
+    }
     this._p.textSize(this._options.textSize);
     this._p.textAlign(this._p.LEFT, this._p.TOP);
 
@@ -300,7 +313,7 @@ export class Graph {
     var my = this.mouseY;
 
     this.logger.debug('Drawing swimlanes');
-    this.swimlanes.reverse().forEach(x => x.draw(mx, my));
+    this.swimlanes.forEach(x => x.draw(mx, my));
 
     this.logger.debug('Drawing xAxis');
     this.xAxis.draw();
@@ -308,8 +321,8 @@ export class Graph {
     this.logger.debug('Drawing overlayAboveGraph');
     this.drawOverlayAboveGraph();
 
-    this.logger.debug('Drawing graphLines');
-    this.drawGraphLines();
+    this.logger.debug('Drawing Y graphLines');
+    this.drawYGraphLines();
 
     this.ycalc.swimLanes.forEach((y, i) => {
       this._p.stroke(200);
@@ -329,10 +342,17 @@ export class Graph {
 
     this.logger.debug('Drawing graphLines');
     this.graphLines.forEach(x => x.draw(mx, my));
+
     this.logger.debug('Drawing graphCircles');
     this.graphCircles.forEach(x =>
       x.forEach(y => {
-        y.draw(mx, my);
+        y.draw();
+      }),
+    );
+
+    this.graphCircles.forEach(x =>
+      x.forEach(y => {
+        y.drawLabel(mx, my);
       }),
     );
   };
@@ -340,12 +360,11 @@ export class Graph {
   isRedrawRequired = (): boolean => {
     let onDrawElement = false;
 
-    // Has the canvas size changed?
     if (this.canvasWidth !== this._p.width || this.canvasHeight !== this._p.height) {
       this.canvasWidth = this._p.width;
       this.canvasHeight = this._p.height;
 
-      console.log('Redraw: Canvas size changed');
+      this.logger.debug('Redraw: Canvas size changed');
       onDrawElement = true;
     }
 
@@ -355,7 +374,7 @@ export class Graph {
         const e = element[ii];
 
         if (e.isMouseOver(this._p.mouseX, this._p.mouseY)) {
-          console.log('Redraw: Cursor is hovering a circle');
+          this.logger.debug('Redraw: Cursor is hovering a circle');
           onDrawElement = true;
           break;
         }
@@ -366,10 +385,14 @@ export class Graph {
     }
 
     if (!onDrawElement && (this._p.mouseX < 0 || this._p.mouseX > this._p.width || this._p.mouseY < 0 || this._p.mouseY > this._p.height)) {
+      // This will spam the logs
+      // this.logger.debug('No redraw: No elements require redraw and mouse cursor is not inside canvas');
       return false;
     }
 
     if (!onDrawElement && this.mouseX === this._p.mouseX && this.mouseY === this._p.mouseY) {
+      // This will spam the logs
+      // this.logger.debug('No redraw: No elements require redraw and mouse cursor has not moved inside the canvas');
       return false;
     }
 
@@ -403,7 +426,6 @@ export class Graph {
     this._p.beginShape();
     this._p.vertex(0, 0);
     this._p.vertex(0, list.at(0).y, 0);
-
     list.forEach(x => {
       this._p.vertex(x.x, x.y);
     });
@@ -412,7 +434,7 @@ export class Graph {
     this._p.endShape(this._p.CLOSE);
   };
 
-  drawGraphLines = () => {
+  drawYGraphLines = () => {
     this._p.strokeWeight(1);
     this._p.textAlign(this._p.LEFT, this._p.CENTER);
     this.ycalc.graphLines.forEach((y, i) => {

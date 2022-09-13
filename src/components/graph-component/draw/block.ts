@@ -11,39 +11,42 @@ export interface BlockData {
   fill: p5.Color;
   stroke: p5.Color;
   cornerRadius: number;
+  labelTextSize: number;
 }
 
 export class Block {
   p: p5;
   data: BlockData;
-  i: number;
 
   constructor(p: p5, data: BlockData) {
     this.p = p;
     this.data = data;
-    this.i = this.data.height;
   }
 
   public draw(x: number, y: number) {
     this.p.fill(this.data.fill);
     this.p.stroke(this.data.stroke);
     this.p.strokeWeight(1);
+    this.p.rect(this.data.x, this.getY(), this.data.width, this.data.height, this.data.cornerRadius);
+
     if (this.isMouseOver(x, y)) {
-      if (this.i < this.data.height * 1.5) {
-        this.i++;
-      }
-      this.p.rect(this.data.x, this.getY(), this.data.width, this.data.height, this.data.cornerRadius);
+      this.data.label = 'test';
       if (this.data.label) {
+        this.p.strokeWeight(1);
+        this.p.stroke(100);
+
+        this.p.fill(255);
+        this.p.textSize(this.data.labelTextSize);
+        const width = this.p.textWidth(this.data.label);
+
+        this.p.rect(x - (width + 10) / 2, y - this.p.textAscent() - 10, width + 10, this.p.textAscent() + this.p.textDescent() + 5, 5, 5, 5, 5);
+
         this.p.fill(0);
         this.p.strokeWeight(0);
         this.p.stroke(0);
+        this.p.textAlign(this.p.CENTER, this.p.CENTER);
         this.p.text(this.data.label, x, y - 10);
       }
-    } else {
-      if (this.i > this.data.height) {
-        this.i--;
-      }
-      this.p.rect(this.data.x, this.getY(), this.data.width, this.data.height, this.data.cornerRadius);
     }
   }
 

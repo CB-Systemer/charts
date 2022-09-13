@@ -16,12 +16,16 @@ export class GraphComponent {
   };
 
   componentDidLoad() {
-    this.graph = new Graph(this.graphContainerRef, this.options, this.data.xaxis, this.data.graphData, this.data.swimlaneData);
+    this.loadGraph();
   }
 
   @Watch('data')
   graphDataWatch() {
     this.graph.dispose();
+    this.loadGraph();
+  }
+
+  loadGraph() {
     this.graph = new Graph(this.graphContainerRef, this.options, this.data.xaxis, this.data.graphData, this.data.swimlaneData);
   }
 

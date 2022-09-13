@@ -15,6 +15,14 @@ export namespace Components {
   };
         "options": GraphOptions;
     }
+    interface GraphComponentTest {
+        "data": {
+    xaxis: XAxisData[];
+    graphData: GraphData[][];
+    swimlaneData: GraphSwimlaneData[];
+  };
+        "options": GraphOptions;
+    }
 }
 declare global {
     interface HTMLGraphComponentElement extends Components.GraphComponent, HTMLStencilElement {
@@ -23,8 +31,15 @@ declare global {
         prototype: HTMLGraphComponentElement;
         new (): HTMLGraphComponentElement;
     };
+    interface HTMLGraphComponentTestElement extends Components.GraphComponentTest, HTMLStencilElement {
+    }
+    var HTMLGraphComponentTestElement: {
+        prototype: HTMLGraphComponentTestElement;
+        new (): HTMLGraphComponentTestElement;
+    };
     interface HTMLElementTagNameMap {
         "graph-component": HTMLGraphComponentElement;
+        "graph-component-test": HTMLGraphComponentTestElement;
     }
 }
 declare namespace LocalJSX {
@@ -36,8 +51,17 @@ declare namespace LocalJSX {
   };
         "options"?: GraphOptions;
     }
+    interface GraphComponentTest {
+        "data"?: {
+    xaxis: XAxisData[];
+    graphData: GraphData[][];
+    swimlaneData: GraphSwimlaneData[];
+  };
+        "options"?: GraphOptions;
+    }
     interface IntrinsicElements {
         "graph-component": GraphComponent;
+        "graph-component-test": GraphComponentTest;
     }
 }
 export { LocalJSX as JSX };
@@ -45,6 +69,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "graph-component": LocalJSX.GraphComponent & JSXBase.HTMLAttributes<HTMLGraphComponentElement>;
+            "graph-component-test": LocalJSX.GraphComponentTest & JSXBase.HTMLAttributes<HTMLGraphComponentTestElement>;
         }
     }
 }

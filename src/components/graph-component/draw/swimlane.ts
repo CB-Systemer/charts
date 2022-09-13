@@ -18,6 +18,7 @@ export interface SwimlaneData {
         cornerRadius: number;
         gradientTop: p5.Color;
         gradientBottom: p5.Color;
+        labelTextSize: number;
       }[]
     | undefined;
   blocks:
@@ -30,6 +31,7 @@ export interface SwimlaneData {
         cornerRadius: number;
         gradientTop: p5.Color;
         gradientBottom: p5.Color;
+        labelTextSize: number;
       }[]
     | undefined;
 }
@@ -57,6 +59,7 @@ export class Swimlane {
             cornerRadius: x.cornerRadius,
             mouseD: this.data.d,
             label: x.value,
+            labelTextSize: x.labelTextSize,
           }),
       ) ?? [];
 
@@ -74,6 +77,7 @@ export class Swimlane {
             stroke: x.stroke,
             fill: x.fill,
             cornerRadius: x.cornerRadius,
+            labelTextSize: x.labelTextSize,
           }),
       ) ?? [];
   }

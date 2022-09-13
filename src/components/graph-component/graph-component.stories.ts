@@ -71,7 +71,7 @@ const defaultArgs = {
         ],
         blocks: [
           {
-            id1: '12',
+            id1: '6',
             id2: '19',
             label: '',
             fillColor: '#075985',
@@ -93,6 +93,7 @@ const defaultArgs = {
     xAxisFormatter: graphData => new Date(graphData).toLocaleDateString(),
     textSize: 16,
     labelTextSize: 12,
+    fonts: ['Soege-UI'],
   },
 };
 
@@ -105,7 +106,7 @@ export default {
 };
 
 const MyComponent = args => {
-  return getComponentWithArgs('graph-component', args, undefined, 'margin: 30px; height: 200px; display: flex; flex-direction: column; flex: 1; overflow: hidden; height: 200px');
+  return getComponentWithArgs('graph-component-test', args, undefined, 'margin: 30px; height: 200px; display: flex; flex-direction: column; flex: 1; overflow: hidden;');
 };
 
 export const Default = MyComponent.bind({});
