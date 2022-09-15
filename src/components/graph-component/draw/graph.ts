@@ -420,18 +420,20 @@ export class Graph {
       });
     });
 
-    this._p.fill(255);
-    this._p.stroke(255);
-    this._p.strokeWeight(0);
-    this._p.beginShape();
-    this._p.vertex(0, 0);
-    this._p.vertex(0, list.at(0).y, 0);
-    list.forEach(x => {
-      this._p.vertex(x.x, x.y);
-    });
-    this._p.vertex(this._p.width, list.at(-1).y);
-    this._p.vertex(this._p.width, 0);
-    this._p.endShape(this._p.CLOSE);
+    if (list.length > 0) {
+      this._p.fill(255);
+      this._p.stroke(255);
+      this._p.strokeWeight(0);
+      this._p.beginShape();
+      this._p.vertex(0, 0);
+      this._p.vertex(0, list.at(0).y, 0);
+      list.forEach(x => {
+        this._p.vertex(x.x, x.y);
+      });
+      this._p.vertex(this._p.width, list.at(-1).y);
+      this._p.vertex(this._p.width, 0);
+      this._p.endShape(this._p.CLOSE);
+    }
   };
 
   drawYGraphLines = () => {
