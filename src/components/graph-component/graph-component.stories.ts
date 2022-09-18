@@ -39,6 +39,14 @@ const defaultArgs = {
         label: 'Lane 1',
         squares: [
           {
+            id: '3',
+            value: '6',
+            fillColor: '#065f46',
+            strokeColor: '#065f46',
+            gradientBottomColor: '#bbf7d0',
+            gradientTopColor: '#f0fdf4',
+          },
+          {
             id: '9',
             value: '6',
             fillColor: '#065f46',
@@ -71,8 +79,17 @@ const defaultArgs = {
         ],
         blocks: [
           {
-            id1: '6',
+            id1: '1',
             id2: '19',
+            label: '',
+            fillColor: '#075985',
+            strokeColor: '#075985',
+            gradientBottomColor: '#7dd3fc',
+            gradientTopColor: '#f0f9ff',
+          },
+          {
+            id1: '30',
+            id2: '90',
             label: '',
             fillColor: '#075985',
             strokeColor: '#075985',

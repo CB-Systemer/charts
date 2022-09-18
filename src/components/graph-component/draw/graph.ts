@@ -153,7 +153,7 @@ export class Graph {
   calcX = () => {
     this._p.textSize(this._options.textSize);
     const maxSwimlaneLabelWidth = this.swimlaneData.map(x => this._p.textWidth(x.label)).reduce((a, b) => Math.max(a, b), 0);
-    const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft;
+    const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft + 15;
 
     const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / this.xaxis.length;
     const split = Math.round(this.xaxis.length / 3);
@@ -256,8 +256,8 @@ export class Graph {
               labelTextSize: this._options.labelTextSize,
             })),
             blocks: x.blocks?.map(b => ({
-              x1: this.getX(b.id1),
-              x2: this.getX(b.id2),
+              x1: this.getX(b.id1) ?? this.xcalc.positions.at(0)?.x,
+              x2: this.getX(b.id2) ?? this.xcalc.positions.at(-1)?.x,
               label: b.label,
               stroke: this._p.color(b.strokeColor ?? '#075985'),
               fill: this._p.color(b.fillColor ?? '#075985'),
@@ -273,6 +273,9 @@ export class Graph {
 
   getX = (id: string) => {
     const xAxis = this.xaxis.findIndex(y => y.id === id);
+    if (xAxis === -1) {
+      return undefined;
+    }
     return this.xcalc.positions[xAxis]?.x;
   };
 

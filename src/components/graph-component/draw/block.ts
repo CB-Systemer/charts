@@ -30,7 +30,6 @@ export class Block {
     this.p.rect(this.data.x, this.getY(), this.data.width, this.data.height, this.data.cornerRadius);
 
     if (this.isMouseOver(x, y)) {
-      this.data.label = 'test';
       if (this.data.label) {
         this.p.strokeWeight(1);
         this.p.stroke(100);
