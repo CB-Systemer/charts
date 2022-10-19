@@ -255,17 +255,19 @@ export class Graph {
               gradientTop: this._p.color(c.gradientTopColor ?? '#f0fdf4'),
               labelTextSize: this._options.labelTextSize,
             })),
-            blocks: x.blocks?.map(b => ({
-              x1: this.getX(b.id1) ?? this.xcalc.positions.at(0)?.x,
-              x2: this.getX(b.id2) ?? this.xcalc.positions.at(-1)?.x,
-              label: b.label,
-              stroke: this._p.color(b.strokeColor ?? '#075985'),
-              fill: this._p.color(b.fillColor ?? '#075985'),
-              cornerRadius: 5,
-              gradientBottom: this._p.color(b.gradientBottomColor ?? '#7dd3fc'),
-              gradientTop: this._p.color(b.gradientTopColor ?? '#f0f9ff'),
-              labelTextSize: this._options.labelTextSize,
-            })),
+            blocks: x.blocks
+              ?.filter(b => this.getX(b.id1) || this.getX(b.id2))
+              .map(b => ({
+                x1: this.getX(b.id1) ?? this.xcalc.positions.at(0)?.x,
+                x2: this.getX(b.id2) ?? this.xcalc.positions.at(-1)?.x,
+                label: b.label,
+                stroke: this._p.color(b.strokeColor ?? '#075985'),
+                fill: this._p.color(b.fillColor ?? '#075985'),
+                cornerRadius: 5,
+                gradientBottom: this._p.color(b.gradientBottomColor ?? '#7dd3fc'),
+                gradientTop: this._p.color(b.gradientTopColor ?? '#f0f9ff'),
+                labelTextSize: this._options.labelTextSize,
+              })),
           }),
       )
       .reverse();
