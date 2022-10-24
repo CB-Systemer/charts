@@ -13,7 +13,6 @@ export interface GraphOptions {
   marginLeft: number;
   spaceGraphSwimlanes: number;
   swimlaneHeight: number;
-  xAxisFormatter: (data: string) => string;
   textSize: number;
   labelTextSize: number;
   fonts: string[];
@@ -23,6 +22,7 @@ export interface GraphOptions {
 export interface XAxisData {
   id: string;
   data: string;
+  label: string | undefined;
 }
 export interface GraphData {
   id: string;
@@ -77,7 +77,6 @@ export class Graph {
         marginLeft: 10,
         spaceGraphSwimlanes: 30,
         swimlaneHeight: 20,
-        xAxisFormatter: graphData => graphData,
         textSize: 16,
         labelTextSize: 12,
         fonts: [],
@@ -155,14 +154,14 @@ export class Graph {
     const maxSwimlaneLabelWidth = this.swimlaneData.map(x => this._p.textWidth(x.label)).reduce((a, b) => Math.max(a, b), 0);
     const graphMarginL = maxSwimlaneLabelWidth + this._options.marginLeft + 15;
 
-    const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / this.xaxis.length;
-    const split = Math.round(this.xaxis.length / 3);
+    const widthBetween = (this._parent.getBoundingClientRect().width - (graphMarginL + this._options.marginRight)) / (this.xaxis.length - 1);
+
     this.xcalc = {
       graphMarginL,
       positions: [...new Array(this.xaxis.length).keys()].map(x => ({
         x: graphMarginL + x * widthBetween,
-        hasMark: x % split === 0 || x === this.xaxis.length - 1,
-        label: this._options.xAxisFormatter(this.xaxis[x].data),
+        hasMark: !!this.xaxis[x].label,
+        label: this.xaxis[x].label,
       })),
     };
   };
