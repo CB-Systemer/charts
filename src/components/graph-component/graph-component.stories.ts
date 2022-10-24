@@ -6,10 +6,11 @@ const xAxis = (): {
   data: string;
 }[] => {
   const graphData = [];
-  for (let index = 3; index < 50; index++) {
+  for (let index = 5; index < 50; index++) {
     graphData.push({
       id: index.toString(),
       data: new Date(Date.UTC(2022, 8, index)).toISOString(),
+      label: index % 10 === 0 ? new Date(Date.UTC(2022, 8, index)).toLocaleDateString() : undefined,
     });
   }
 
@@ -80,7 +81,7 @@ const defaultArgs = {
         blocks: [
           {
             id1: '1',
-            id2: '19',
+            id2: '3',
             label: '',
             fillColor: '#075985',
             strokeColor: '#075985',
@@ -107,7 +108,6 @@ const defaultArgs = {
     marginLeft: 10,
     spaceGraphSwimlanes: 30,
     swimlaneHeight: 25,
-    xAxisFormatter: graphData => new Date(graphData).toLocaleDateString(),
     textSize: 16,
     labelTextSize: 12,
     fonts: ['Soege-UI'],
