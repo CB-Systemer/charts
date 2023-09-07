@@ -12,6 +12,9 @@ log.txt
 *.sublime-project
 *.sublime-workspace
 
+# Omit all components.d.ts
+**/*/components.d.ts
+
 .stencil/
 .idea/
 .vscode/
